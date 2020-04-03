@@ -11,7 +11,7 @@ export default function Routes()
 {
 	return(
 		<Router>
-			<Scene initial={true} >
+			<Scene hideNavBar={true} initial={true} >
      			<Scene name="Home" component={Home} type="replace" initial={true} />
      		</Scene>
 		 </Router>

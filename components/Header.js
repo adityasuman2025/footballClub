@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, AsyncStorage, Alert} from 'react-native';
+import { StyleSheet, Text, View, Image} from 'react-native';
 
 export default function Header({toCarry}) 
 {
@@ -18,11 +18,9 @@ export default function Header({toCarry})
 const styles = StyleSheet.create({
 	header:
 	{
-		backgroundColor: '#455a64',
-		borderWidth: 1,
-		borderColor: '#3d4e56',
-		height: 80,
-		paddingTop: 27,
+		backgroundColor: '#374c56',
+		paddingTop: 33,
+		paddingBottom: 10,
 		paddingLeft: 10,
 		width: '100%',
 		flexDirection: 'row',
@@ -32,7 +30,7 @@ const styles = StyleSheet.create({
 	
 	titleContainer:
     {	
-    	width: '50%',
+    	width: '100%',
     	flexDirection: 'row',
 		alignItems: 'center', //vertical align
     	justifyContent: 'flex-start', //horizontal align
@@ -50,18 +48,4 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		color: '#fff',
     },
-
-    logOutContainer:
-    {
-    	width: '50%',
-    	alignItems: 'flex-end',
-    },
-
-    logOutImg:
-    {
-    	height: 25,
-		width: 25,
-		marginRight: 10,
-		tintColor: '#181915',		
-    }
 });
