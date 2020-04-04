@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Picker, AsyncStorage, Image } from 'react-native';
+import { StyleSheet, Text, View, Picker} from 'react-native';
 import axios from 'axios';
+import {Actions} from 'react-native-router-flux';
 
 import { globalStyles } from '../styles/globalStyles';
 import Header from '../components/Header';
@@ -8,7 +9,7 @@ import Header from '../components/Header';
 export default function Home() 
 {
   const [error, setError] = useState(""); 
-  const [options, setOptions] = useState(["", "Andaman & Nicobar", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra & Nagar Haveli", "Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Pondicherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Tripura", "Uttar Pradesh", "Uttaranchal", "West Bengal"]);
+  const [options, setOptions] = useState(["Choose State", "Andaman & Nicobar", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra & Nagar Haveli", "Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Pondicherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Tripura", "Uttar Pradesh", "Uttaranchal", "West Bengal"]);
   const [selectedValue, setSelectedValue] = useState("");
 
   const selectAOptionHandler = (itemValue, itemIndex) =>
@@ -17,6 +18,11 @@ export default function Home()
     // console.log(itemIndex);
 
     setSelectedValue(itemValue);
+
+    if(itemIndex != 0)
+    {
+      Actions.ViewClubs({ selectedState: itemValue });
+    }
   }
 
 //rendering
