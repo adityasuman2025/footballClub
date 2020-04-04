@@ -7,12 +7,16 @@
 	if(is_array($data))
 	{
 		$selectedState = $data['selectedState'];
+		$limit = $data['limit'];
+		$offset = $data['offset'];
 
 		if($selectedState != "")
 		{
 			$selectedState = htmlentities(mysqli_real_escape_string($connect_link, $selectedState));
+			$limit = htmlentities(mysqli_real_escape_string($connect_link, $limit));
+			$offset = htmlentities(mysqli_real_escape_string($connect_link, $offset));
 			
-			$mysql_qry = "SELECT * FROM football_clubs WHERE club_state = '$selectedState'";
+			$mysql_qry = "SELECT * FROM football_clubs WHERE club_state = '$selectedState' LIMIT $limit OFFSET $offset";
 			if($result = @mysqli_query($connect_link ,$mysql_qry))
 			{
 				$result_array = array();
@@ -28,7 +32,7 @@
 				echo 0;
 		}
 		else
-			echo -1;
+			echo -10;
 	}
 	else
 		echo -1;
