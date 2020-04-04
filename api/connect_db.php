@@ -4,9 +4,10 @@
 	$now = date('Y-m-d H:i:s');
 
 	$website = $_SERVER['HTTP_HOST']; //dns address of the site 
+	$localIP = getHostByName(getHostName());
 
-//iit patna server	
-	if($website == "localhost")
+//local server
+	if($website == "localhost" || $website == $localIP)
 	{
 		$mysql_host = "localhost";
 		$mysql_username  = "root";

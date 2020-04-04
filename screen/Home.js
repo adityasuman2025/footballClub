@@ -6,22 +6,21 @@ import {Actions} from 'react-native-router-flux';
 import { globalStyles } from '../styles/globalStyles';
 import Header from '../components/Header';
 
-export default function Home() 
+export default function Home(toCarry) 
 {
+  const api_address = toCarry.api_address;
+
   const [error, setError] = useState(""); 
   const [options, setOptions] = useState(["Choose State", "Andaman & Nicobar", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra & Nagar Haveli", "Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Pondicherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Tripura", "Uttar Pradesh", "Uttaranchal", "West Bengal"]);
   const [selectedValue, setSelectedValue] = useState("");
 
   const selectAOptionHandler = (itemValue, itemIndex) =>
   {
-    // console.log(itemValue);
-    // console.log(itemIndex);
-
     setSelectedValue(itemValue);
 
     if(itemIndex != 0)
     {
-      Actions.ViewClubs({ selectedState: itemValue });
+      Actions.ListClubs({ selectedState: itemValue, api_address: api_address });
     }
   }
 
