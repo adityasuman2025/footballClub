@@ -1376,9 +1376,10 @@
 			</tbody></table>
 		</div>
 		<br />
-
-		<input type="submit" id="submit_btn" />
+		
 		<div id="error"></div>
+		<input type="submit" id="submit_btn" />
+		<br />
 
 		<script type="text/javascript">
 			$('#submit_btn').on("click", function()
@@ -1418,7 +1419,16 @@
 			//sending to api	
 				$.post("insert_clubs_in_db.php", {JSON: JSON}, function(e)
 				{
-					console.log(e);
+					if(e == 1)
+						$('#error').text("Data succesffuly inserted into database").css("color", 'green');
+					else if(e == -100)
+						$('#error').text("Database connection failed").css("color", 'red');
+					else if(e == -1)
+						$('#error').text("Something went wrong").css("color", 'red');
+					else if(e == 0)
+						$('#error').text("Failed to insert data").css("color", 'red');
+					else
+						$('#error').text("Unknown error").css("color", 'red');
 				});
 			});
 		</script>
