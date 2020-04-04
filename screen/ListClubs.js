@@ -12,13 +12,15 @@ export default function ListClubs(toCarry)
   const selectedState = toCarry.selectedState;
 
   const [error, setError] = useState("loading..."); 
-  const [clubs, setClubs] = useState([]); 
   const [firstLoad, setFirstLoad] = useState(true);
+  
+  const [clubs, setClubs] = useState([]); 
+ 
   var limit = 10;
-  var offset = 0; 
+  const [offset, setOffset] = useState(0); 
 
 //loading 10 clubs by default
-  const post_address = api_address + "get_clubs_of_a_state.php";
+  var post_address = api_address + "get_clubs_of_a_state.php";
 
   if(firstLoad)
   {
@@ -98,30 +100,16 @@ export default function ListClubs(toCarry)
         }
         else //some data is there
         {
-          console.log(dataString);
+          // console.log(dataString);
           setError("");
-         
-          // setClubs(data);
-            setClubs((prevNotesOldList) => 
-            {     
-              return [
-                ...prevNotesOldList,
-                ...data
-              ];
-            });
 
-          // for (var row of data)
-          // {
-          //   console.log(row);
-
-          //   setClubs((prevNotesOldList) => 
-          //   {     
-          //     return [
-          //       ...prevNotesOldList,
-          //       row
-          //     ];
-          //   });
-          // }
+          setClubs((prevNotesOldList) => 
+          {     
+            return [
+              ...prevNotesOldList,
+              ...data
+            ];
+          });
         }
       }
       catch
@@ -142,6 +130,54 @@ export default function ListClubs(toCarry)
       contentSize.height - paddingToBottom;
   };
 
+//on pressing like btn
+  const onPressLikeBtnHandler = (index, club_id, old_likes) =>
+  {
+    var post_address = api_address + "increase_like_count_for_a_club.php";
+    
+    axios.post(post_address, 
+    {
+      club_id: club_id,
+      old_likes: old_likes
+    })
+    .then(function(response) 
+    {
+      try
+      {
+        var data = response.data;
+        var dataString = JSON.stringify((response.data));
+        // console.log(dataString);
+
+        if(dataString == 0)
+        {
+          setError("failed to like this club");
+        }
+        else if(dataString == -1)
+        {
+          setError("something went wrong");
+        }
+        else if(dataString == 1)
+        {
+        //getting the old data and updating likes in that data
+          var oldJSON = clubs;
+          oldJSON[index]["club_likes"] = +old_likes + +1;
+          
+        //setting the updated data  
+          setClubs([]);
+          setClubs(oldJSON);
+        }
+      }
+      catch
+      {
+        setError("failed to load club list");
+      }          
+    })
+    .catch(error => 
+    {
+      setError("please check your internet connection");
+    });
+  }
+
 //rendering
   return (
     <View style={globalStyles.container}>
@@ -152,7 +188,7 @@ export default function ListClubs(toCarry)
         {
           if(isCloseToBottom(nativeEvent) && error != "no football clubs found")
           {            
-            offset = offset + limit;
+            setOffset(+offset + +limit);
             getDataFromAPI(limit, offset);
             console.log(offset);
           }
@@ -175,7 +211,7 @@ export default function ListClubs(toCarry)
                   <Text style={styles.listText} >{ item.club_name }</Text>
                   <Text style={styles.listType} >{ item.club_city} </Text>
                 </View>            
-                <TouchableOpacity >
+                <TouchableOpacity onPress={() => onPressLikeBtnHandler(idx, item.club_id, item.club_likes)}>
                   <Image 
                       source= {require('../img/like.png')}
                       style={styles.icon} 
