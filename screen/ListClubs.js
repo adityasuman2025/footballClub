@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, Image, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Button, Image, ScrollView, FlatList, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import {Actions} from 'react-native-router-flux';
 
@@ -8,11 +8,13 @@ import Header from '../components/Header';
 
 export default function ListClubs(toCarry) 
 {
-  const api_address = toCarry.api_address; 
+  const api_address = "http://mngo.in/football_api/"; //toCarry.api_address; 
   const selectedState = toCarry.selectedState;
 
-  const [error, setError] = useState("loading..."); 
+  const [error, setError] = useState(""); 
   const [firstLoad, setFirstLoad] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [isEndReached, setIsEndReached] = useState(false);
   
   const [clubs, setClubs] = useState([]); 
  
@@ -20,10 +22,9 @@ export default function ListClubs(toCarry)
   const [offset, setOffset] = useState(0); 
 
 //loading 10 clubs by default
-  var post_address = api_address + "get_clubs_of_a_state.php";
-
   if(firstLoad)
-  {
+  { 
+    var post_address = api_address + "get_clubs_of_a_state.php";
     axios.post(post_address, 
     {
       selectedState: selectedState,
@@ -36,8 +37,7 @@ export default function ListClubs(toCarry)
       {
         var data = response.data;
         var dataString = JSON.stringify((response.data));
-        // console.log(dataString);
-
+       
         if(dataString == 0)
         {
           setError("failed to get club list");
@@ -49,13 +49,20 @@ export default function ListClubs(toCarry)
         else if(dataString == "[]")
         {
           setError("no football clubs found");
+          setLoading(false);
         }
         else //some data is there
         {
           setError("");
           setClubs(data);
 
-          setFirstLoad(false);
+          setFirstLoad(false); //by deafult loading of data is done
+
+          if(data.length < limit) //if no of clubs less than limit
+          {
+            setIsEndReached(true);
+            setLoading(false);
+          }
         }
       }
       catch
@@ -68,79 +75,11 @@ export default function ListClubs(toCarry)
       setError("please check your internet connection");
     });
   }
-
-//calling more data on scrolling
-  const getDataFromAPI = (limit, fun_offset) =>
-  {
-    setError("loading more clubs");
-    
-    axios.post(post_address, 
-    {
-      selectedState: selectedState,
-      limit: limit,
-      offset: fun_offset
-    })
-    .then(function(response) 
-    {
-      try
-      {
-        var data = response.data;
-        var dataString = JSON.stringify((response.data));
-        // console.log(dataString);
-
-        if(dataString == 0)
-        {
-          setError("failed to get club list");
-        }
-        else if(dataString == -1)
-        {
-          setError("something went wrong");
-        }
-        else if(dataString == "[]")
-        {
-          setError("no football clubs found");
-        }
-        else //some data is there
-        {
-          // var oldText = error;
-          // oldText = oldText + dataString;
-          // setError("");
-          // setError(oldText);
-
-          // console.log(dataString);
-          
-          setClubs((prevNotesOldList) => 
-          {     
-            return [
-              ...prevNotesOldList,
-              ...data
-            ];
-          });
-        }
-      }
-      catch
-      {
-        setError("failed to load club list");
-      }          
-    })
-    .catch(error => 
-    {
-      setError("please check your internet connection");
-    });
-  }
-
-//function to recognize end of the scroll
-  const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-    const paddingToBottom = 20;
-    return layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom;
-  };
 
 //on pressing like btn
   const onPressLikeBtnHandler = (index, club_id, old_likes) =>
   {
     var post_address = api_address + "increase_like_count_for_a_club.php";
-    
     axios.post(post_address, 
     {
       club_id: club_id,
@@ -152,8 +91,7 @@ export default function ListClubs(toCarry)
       {
         var data = response.data;
         var dataString = JSON.stringify((response.data));
-        // console.log(dataString);
-
+        
         if(dataString == 0)
         {
           setError("failed to like this club");
@@ -164,6 +102,8 @@ export default function ListClubs(toCarry)
         }
         else if(dataString == 1)
         {
+          setError("");
+
         //getting the old data and updating likes in that data
           var oldJSON = clubs;
           oldJSON[index]["club_likes"] = +old_likes + +1;
@@ -184,81 +124,125 @@ export default function ListClubs(toCarry)
     });
   }
 
-//ok bro
-const okBro = () =>
-{
-  if(error != "no football clubs found")
+//calling more data on scrolling
+  const getDataFromAPI = (limit, fun_offset) =>
   {
-    var temp_offset = +offset + +limit;
+    var post_address = api_address + "get_clubs_of_a_state.php";
+    axios.post(post_address, 
+    {
+      selectedState: selectedState,
+      limit: limit,
+      offset: fun_offset
+    })
+    .then(function(response) 
+    {
+      try
+      {
+        var data = response.data;
+        var dataString = JSON.stringify((response.data));
+       
+        if(dataString == 0)
+        {
+          setError("failed to get club list");
+        }
+        else if(dataString == -1)
+        {
+          setError("something went wrong");
+        }
+        else if(dataString == "[]") //no more clubs are found // end of football clubs is reached
+        {
+          setIsEndReached(true);
 
-    setOffset("");
-    setOffset(temp_offset);
+          //setError("no more football clubs found");
+        }
+        else //some data is there
+        {
+          setError("");
+          setLoading(false); //removing the loading animation
 
-    getDataFromAPI(limit, temp_offset);
-    
-    console.log(temp_offset);
+        //adding the new data in list  
+          setClubs((prevNotesOldList) => 
+          {     
+            return [
+              ...prevNotesOldList,
+              ...data
+            ];
+          });
+        }
+      }
+      catch
+      {
+        setError("failed to load club list");
+      }          
+    })
+    .catch(error => 
+    {
+      setError("please check your internet connection");
+    });
   }
-}
+
+//ok bro
+  const okBro = () =>
+  {
+    if(!isEndReached) //if all football clubs have not been shown yet
+    {
+      setLoading(true); //showing the loading animation
+
+      var temp_offset = +offset + +limit;
+
+      setOffset("");
+      setOffset(temp_offset);
+
+      getDataFromAPI(limit, temp_offset);
+    }
+  }
 
 //rendering
   return (
     <View style={globalStyles.container}>
       <Header toCarry={ {title: selectedState} } />
-      <ScrollView 
+
+      <Text style={globalStyles.errorText} >{error}</Text>
+
+      <FlatList 
         style = {styles.list}
-        onScroll={({nativeEvent}) => 
-        {
-          if(isCloseToBottom(nativeEvent))
-          {            
-            okBro();
-          }
-        }}
+        data={clubs}
+        keyExtractor ={(item) => item.notes_id }
 
-        // onTouchStart={() => console.log('onTouchStart')}
-        // onTouchMove={() => console.log('onTouchMove')}
-        // onTouchEnd={() => console.log('onTouchEnd')}
-        // onScrollBeginDrag={() => console.log('onScrollBeginDrag')}
-        // onScrollEndDrag={() => console.log('onScrollEndDrag')}
-        // onMomentumScrollBegin={() => console.log('onMomentumScrollBegin')}
-        // onMomentumScrollEnd={() => console.log('onMomentumScrollEnd')}
-      >
-      {
-        clubs.map((item, idx) => 
-        {
-          return(
-              <View key={idx} style={styles.box}>
-                <View>
-                  <Text style={styles.listText} >{ item.club_name }</Text>
-                  <Text style={styles.listType} >{ item.club_city} </Text>
-                </View>            
-                <TouchableOpacity onPress={() => onPressLikeBtnHandler(idx, item.club_id, item.club_likes)}>
-                  <Image 
-                      source= {require('../img/like.png')}
-                      style={styles.icon} 
-                    />
-                    <Text style={styles.listLikes} >{ item.club_likes} </Text>
-                </TouchableOpacity>
-              </View>
-          )
-        })
-      }
-      </ScrollView>
+        onEndReached={() => okBro()}
+        onEndReachedThreshold={0.0001} //it must be greater than 0
+        
+        ListFooterComponent={() =>
+          loading && !isEndReached
+          ? <ActivityIndicator size="large" animating />
+          : null
+        }
 
-      {/*--------<Button
-          title="Press me"
-          onPress={() => okBro()}
-        />---*/}
-
-        <Text style={globalStyles.errorText} >{error}</Text>
+        renderItem={({ item, index }) => (
+          <TouchableOpacity style={styles.box}>
+            <View>
+              <Text style={styles.listText} >{ item.club_name }</Text>
+              <Text style={styles.listType} >{ item.club_city} </Text>
+            </View>            
+            <TouchableOpacity onPress={() => onPressLikeBtnHandler(index, item.club_id, item.club_likes)}>
+              <Image 
+                  source= {require('../img/like.png')}
+                  style={styles.icon} 
+                />
+                <Text style={styles.listLikes} >{ item.club_likes} </Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-   list:
+  list:
   {
     width: '100%',
-    height: '100%',
+    // height: '100%',
   },
 
   box:
@@ -279,9 +263,6 @@ const styles = StyleSheet.create({
     height: 25,
     width: 25,
     tintColor: '#d8d8d8',
-    // marginRight: 2,
-
-    // backgroundColor: 'blue',
   },
 
   listText:
