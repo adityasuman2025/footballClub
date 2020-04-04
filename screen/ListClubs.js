@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Button, Image, ScrollView} from 'react-native';
 import axios from 'axios';
 import {Actions} from 'react-native-router-flux';
 
@@ -70,13 +70,15 @@ export default function ListClubs(toCarry)
   }
 
 //calling more data on scrolling
-  const getDataFromAPI = (limit, offset) =>
+  const getDataFromAPI = (limit, fun_offset) =>
   {
+    setError("loading more clubs");
+    
     axios.post(post_address, 
     {
       selectedState: selectedState,
       limit: limit,
-      offset: offset
+      offset: fun_offset
     })
     .then(function(response) 
     {
@@ -100,9 +102,13 @@ export default function ListClubs(toCarry)
         }
         else //some data is there
         {
-          // console.log(dataString);
-          setError("");
+          // var oldText = error;
+          // oldText = oldText + dataString;
+          // setError("");
+          // setError(oldText);
 
+          // console.log(dataString);
+          
           setClubs((prevNotesOldList) => 
           {     
             return [
@@ -178,6 +184,22 @@ export default function ListClubs(toCarry)
     });
   }
 
+//ok bro
+const okBro = () =>
+{
+  if(error != "no football clubs found")
+  {
+    var temp_offset = +offset + +limit;
+
+    setOffset("");
+    setOffset(temp_offset);
+
+    getDataFromAPI(limit, temp_offset);
+    
+    console.log(temp_offset);
+  }
+}
+
 //rendering
   return (
     <View style={globalStyles.container}>
@@ -186,11 +208,9 @@ export default function ListClubs(toCarry)
         style = {styles.list}
         onScroll={({nativeEvent}) => 
         {
-          if(isCloseToBottom(nativeEvent) && error != "no football clubs found")
+          if(isCloseToBottom(nativeEvent))
           {            
-            setOffset(+offset + +limit);
-            getDataFromAPI(limit, offset);
-            console.log(offset);
+            okBro();
           }
         }}
 
@@ -224,7 +244,12 @@ export default function ListClubs(toCarry)
       }
       </ScrollView>
 
-      <Text style={globalStyles.errorText} >{error}</Text>
+      {/*--------<Button
+          title="Press me"
+          onPress={() => okBro()}
+        />---*/}
+
+        <Text style={globalStyles.errorText} >{error}</Text>
     </View>
   );
 }
@@ -233,7 +258,7 @@ const styles = StyleSheet.create({
    list:
   {
     width: '100%',
-    height: '110%',
+    height: '100%',
   },
 
   box:

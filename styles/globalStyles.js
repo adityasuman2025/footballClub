@@ -59,8 +59,7 @@ export const globalStyles = StyleSheet.create(
     margin: 0,
     width: '100%',
     textAlign: 'center',
-
-    // backgroundColor: 'blue',
+    color: '#ff0505',
   },
 
   successText:

@@ -10,7 +10,7 @@ import ListClubs from '../screen/ListClubs';
 
 export default function Routes()
 {
-	const api_address = "http://192.168.43.11/upbringoTest/api/";
+	const api_address = "http://mngo.in/football_api/";
 
 	return(
 		<Router>
