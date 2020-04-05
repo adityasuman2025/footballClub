@@ -25,7 +25,7 @@ export default function ListClubs(toCarry)
   if(firstLoad)
   { 
     var post_address = api_address + "get_clubs_of_a_state.php";
-    axios.post(post_address, 
+    axios.post(post_address, //axios will not work in andorid 8+ for fixing this, add 'android:usesCleartextTraffic="true"' in AndroidManifest.xml in application tag
     {
       selectedState: selectedState,
       limit: limit,
