@@ -27,7 +27,7 @@ export default function Home(toCarry)
 //rendering
   return (
     <View style={globalStyles.container}>
-      <Header toCarry={ {title: "Upbringo Assignment"} } />
+      <Header toCarry={ {title: "Football Club"} } />
       
       <ImageBackground source={require('../img/football.png')} style={styles.backgroundImage} >
         <View style={styles.list}>
