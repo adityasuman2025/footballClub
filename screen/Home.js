@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Picker} from 'react-native';
+import { StyleSheet, Text, View, Picker, Imag, ImageBackground} from 'react-native';
 import axios from 'axios';
 import {Actions} from 'react-native-router-flux';
 
@@ -28,12 +28,12 @@ export default function Home(toCarry)
   return (
     <View style={globalStyles.container}>
       <Header toCarry={ {title: "Upbringo Assignment"} } />
+      
+      <ImageBackground source={require('../img/football.png')} style={styles.backgroundImage} >
         <View style={styles.list}>
-          <Text style={styles.listText}>Select State</Text>
+          <Text style={styles.listText}>Football Club</Text>
           <Picker
-            style={styles.box}
-            selectedValue={selectedValue}
-            // style={{ height: 50, width: '100%' }}
+            selectedValue={selectedValue}            
             // mode="dropdown"
             onValueChange={(itemValue, itemIndex) => selectAOptionHandler(itemValue, itemIndex)}
           >
@@ -46,7 +46,8 @@ export default function Home(toCarry)
             }
           </Picker>
         </View>
-      <Text style={globalStyles.errorText} >{error}</Text>
+      </ImageBackground>
+
     </View>
   );
 }
@@ -63,11 +64,23 @@ const styles = StyleSheet.create({
   {
     color: "#f1f1f1",
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 22,
     textAlign: 'center',
 
     borderBottomColor: '#f1f1f1',
     borderBottomWidth: 1,
     paddingBottom: 10,
   },
+
+  backgroundImage: 
+  {
+    flex: 1,
+    resizeMode: 'cover', // or 'stretch'
+    width: '100%',
+    justifyContent: 'center',
+    textAlign: 'center',
+    alignItems:'center',
+    
+    // height: '100%'
+  }
 });
