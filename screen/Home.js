@@ -79,8 +79,6 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     textAlign: 'center',
-    alignItems:'center',
-    
-    // height: '100%'
+    alignItems:'center'
   }
 });
